@@ -1,0 +1,124 @@
+import altair as alt
+import pandas as pd
+import streamlit as st
+
+# load data 
+df = pd.read_csv("civic_data.tsv")
+df_unique = pd.read_csv("civic_data_unique.tsv")
+
+### Number of Occurrences of All Diseases Reported in a Year ###
+
+"""
+plot of Number of Occurrences of All Diseases Reported in a Year
+"""
+# replace with st.slider
+Year = st.slider("Year", min(df["year"]), max(df["year"]), value = 2018)
+subset = df[df["year"] == Year]
+
+plot1 = alt.Chart(subset).mark_bar().encode(
+    x=alt.X('disease:N', title="Diseases", sort="-y"),
+    y=alt.Y(aggregate = "count", type='quantitative', title="Number of Occurences")
+).properties(
+    title="Number of Occurrences of All Diseases Reported in {Year}",
+    width=600,
+    height=600
+)
+
+### Number of Variants for Each Gene ###
+"""
+plot of Number of Variants for Each Gene
+"""
+
+plot2 = alt.Chart(df).mark_bar().encode(
+    x=alt.X('gene:N', title="Gene Names"),
+    y=alt.Y('num_var:Q', title="Number of Variants"),
+    tooltip=["gene", "num_var"] 
+).properties(
+    title="Number of Variants for Each Gene",
+    width=600,
+    height=600
+).transform_aggregate(
+    num_var='count(variant)',
+    groupby=["gene"]
+)
+
+### Disease Gene Variant Heatmap ###
+"""
+plot of Disease Gene Variant Heatmap
+"""
+
+plot3=alt.Chart(df).mark_rect().encode(
+    x=alt.X("gene:N",bin=False, title="Genes"),
+    y=alt.Y("disease:N",bin=False, title= "Diseases"),
+    color = alt.Color('count():Q'),
+    tooltip=["disease","gene","variant"]
+).properties(
+    title="Disease Gene Variant Heatmap",
+    width=600,
+    height=600
+)
+
+### Time Series of Disease Occurances ###
+"""
+plot of Time Series of Disease Occurances
+"""
+
+plot4 = alt.Chart(df).mark_line().encode(
+    alt.X("year:Q"),
+    alt.Y("num_occ:Q", title="Number of Disease Occurances"), 
+).properties(
+    title="Time Series of Disease Occurances",
+    width=600,
+    height=600
+).transform_aggregate(
+    num_occ='count(disease)',
+    groupby=["year"]
+)
+
+### Number of Evidence Showing Connection between Variant and Disease
+donut1 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+    theta = alt.Theta("num_ev:Q"),
+    color = "disease:N",
+    tooltip=["num_ev:Q", "disease:N","variant:N"]
+).transform_aggregate(
+    num_ev='count(evidence_id)',
+    groupby=["disease","variant"]
+).properties(
+    width=250
+)
+
+### Number of Evidence Showing Connection between Variant and Therapy
+donut2 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+    theta = alt.Theta("num_ev:Q"),
+    color = "drugs:N",
+    tooltip=["num_ev:Q", "variant:N","drugs:N"]
+).transform_aggregate(
+    num_ev='count(evidence_id)',
+    groupby=["drugs","variant"]
+).properties(
+    width=250
+)
+
+### Number of Evidence Showing Connection between Therapy and Variant
+donut3 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+    theta = alt.Theta("num_ev:Q"),
+    color = "variant:N",
+    tooltip=["num_ev:Q", "variant:N","drugs:N"]
+).transform_aggregate(
+    num_ev='count(evidence_id)',
+    groupby=["variant","drugs"]
+).properties(
+    width=250
+)
+
+### Number of Evidence Showing Connection between Therapy and Disease
+donut4 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+    theta = alt.Theta("num_ev:Q"),
+    color = "disease:N",
+    tooltip=["num_ev:Q", "disease:N","drugs:N"]
+).transform_aggregate(
+    num_ev='count(evidence_id)',
+    groupby=["disease","drugs"]
+).properties(
+    width=250
+)
