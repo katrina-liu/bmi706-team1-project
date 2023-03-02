@@ -1,5 +1,8 @@
 import streamlit as st
 
+df = pd.read_csv("data/civic_data.tsv")
+df_unique = pd.read_csv("data/civic_data_unique.tsv")
+
 variant = st.text_input("Search a variant here:")
 
 if len(variant) > 0:  # TODO: Change this to if variant is valid
