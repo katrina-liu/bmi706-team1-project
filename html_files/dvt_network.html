@@ -45,6 +45,25 @@
              
 
              
+             /* position absolute is important and the container has to be relative or absolute as well. */
+          div.popup {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 display:none;
+                 background-color:#f5f4ed;
+                 -moz-border-radius: 3px;
+                 -webkit-border-radius: 3px;
+                 border-radius: 3px;
+                 border: 1px solid #808074;
+                 box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+          }
+
+          /* hide the original tooltip */
+          .vis-tooltip {
+            display:none;
+          }
+             
         </style>
     </head>
 
@@ -88,7 +107,7 @@
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"group": 0, "id": 0, "label": "Breast Cancer", "shape": "dot", "size": 20, "title": "disease"}, {"group": 1, "id": 1, "label": "ERBB2-AMPLIFICATION", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 3, "label": "ERBB4-NUCLEAR TRANSLOCATION", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 4, "label": "BRCA1-MUTATION", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 6, "label": "BRCA2-MUTATION", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 7, "label": "FGFR1-Amplification", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 9, "label": "PIK3CA-E542K", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 11, "label": "PIK3CA-E545K", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 12, "label": "PIK3CA-H1047L", "shape": "dot", "size": 20, "title": "variant"}, {"group": 1, "id": 14, "label": "IGF1R-Overexpression", "shape": "dot", "size": 20, "title": "variant"}, {"group": 2, "id": 2, "label": "Trastuzumab", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 5, "label": "Olaparib", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 8, "label": "Lucitanib", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 10, "label": "PI-103", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 13, "label": "PI3Ka/Di", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 3, "id": 16, "label": "Cisplatin", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 15, "label": "Exemestane,Metformin", "shape": "dot", "size": 20, "title": "drugs"}, {"fixed": true, "group": 0, "id": 17, "label": "Disease", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": -100}, {"fixed": true, "group": 1, "id": 18, "label": "Gene-Variant", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": -20}, {"fixed": true, "group": 2, "id": 19, "label": "Known Variant", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": 60}, {"fixed": true, "group": 3, "id": 20, "label": "Unknown Therapy", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": 140}]);
+                  nodes = new vis.DataSet([{"group": 0, "id": 0, "label": "Breast Cancer", "shape": "dot", "size": 20, "title": "disease"}, {"group": 1, "id": 1, "label": "ERBB2-AMPLIFICATION", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 3, "label": "ERBB4-NUCLEAR TRANSLOCATION", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 4, "label": "BRCA1-MUTATION", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 6, "label": "BRCA2-MUTATION", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 7, "label": "FGFR1-Amplification", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 9, "label": "PIK3CA-E542K", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 11, "label": "PIK3CA-E545K", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 12, "label": "PIK3CA-H1047L", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 1, "id": 14, "label": "IGF1R-Overexpression", "shape": "dot", "size": 20, "title": "\u003ca href=\u0027http://localhost:8501/variant?variant=Overexpression\u0027\u003e\u0027variant"}, {"group": 2, "id": 2, "label": "Trastuzumab", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 5, "label": "Olaparib", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 8, "label": "Lucitanib", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 10, "label": "PI-103", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 13, "label": "PI3Ka/Di", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 3, "id": 16, "label": "Cisplatin", "shape": "dot", "size": 20, "title": "drugs"}, {"group": 2, "id": 15, "label": "Exemestane,Metformin", "shape": "dot", "size": 20, "title": "drugs"}, {"fixed": true, "group": 0, "id": 17, "label": "Disease", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": -100}, {"fixed": true, "group": 1, "id": 18, "label": "Gene-Variant", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": -20}, {"fixed": true, "group": 2, "id": 19, "label": "Known Variant", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": 60}, {"fixed": true, "group": 3, "id": 20, "label": "Unknown Therapy", "physics": false, "shape": "dot", "size": 10, "x": -600, "y": 140}]);
                   edges = new vis.DataSet([{"from": 0, "to": 1, "width": 1}, {"from": 0, "to": 3, "width": 1}, {"from": 0, "to": 4, "width": 1}, {"from": 0, "to": 6, "width": 1}, {"from": 0, "to": 7, "width": 1}, {"from": 0, "to": 9, "width": 1}, {"from": 0, "to": 11, "width": 1}, {"from": 0, "to": 12, "width": 1}, {"from": 0, "to": 14, "width": 1}, {"from": 1, "to": 2, "width": 1}, {"from": 2, "to": 3, "width": 1}, {"from": 4, "to": 5, "width": 1}, {"from": 5, "to": 6, "width": 1}, {"from": 7, "to": 8, "width": 1}, {"from": 9, "to": 10, "width": 1}, {"from": 9, "to": 13, "width": 1}, {"from": 10, "to": 11, "width": 1}, {"from": 10, "to": 12, "width": 1}, {"from": 11, "to": 13, "width": 1}, {"from": 11, "to": 16, "width": 1}, {"from": 12, "to": 13, "width": 1}, {"from": 14, "to": 15, "width": 1}]);
 
                   nodeColors = {};
@@ -141,6 +160,68 @@
 
                   
 
+                  
+                  // make a custom popup
+                      var popup = document.createElement("div");
+                      popup.className = 'popup';
+                      popupTimeout = null;
+                      popup.addEventListener('mouseover', function () {
+                          console.log(popup)
+                          if (popupTimeout !== null) {
+                              clearTimeout(popupTimeout);
+                              popupTimeout = null;
+                          }
+                      });
+                      popup.addEventListener('mouseout', function () {
+                          if (popupTimeout === null) {
+                              hidePopup();
+                          }
+                      });
+                      container.appendChild(popup);
+
+
+                      // use the popup event to show
+                      network.on("showPopup", function (params) {
+                          showPopup(params);
+                      });
+
+                      // use the hide event to hide it
+                      network.on("hidePopup", function (params) {
+                          hidePopup();
+                      });
+
+                      // hiding the popup through css
+                      function hidePopup() {
+                          popupTimeout = setTimeout(function () { popup.style.display = 'none'; }, 500);
+                      }
+
+                      // showing the popup
+                      function showPopup(nodeId) {
+                          // get the data from the vis.DataSet
+                          var nodeData = nodes.get([nodeId]);
+                          popup.innerHTML = nodeData[0].title;
+
+                          // get the position of the node
+                          var posCanvas = network.getPositions([nodeId])[nodeId];
+
+                          // get the bounding box of the node
+                          var boundingBox = network.getBoundingBox(nodeId);
+
+                          //position tooltip:
+                          posCanvas.x = posCanvas.x + 0.5 * (boundingBox.right - boundingBox.left);
+
+                          // convert coordinates to the DOM space
+                          var posDOM = network.canvasToDOM(posCanvas);
+
+                          // Give it an offset
+                          posDOM.x += 10;
+                          posDOM.y -= 20;
+
+                          // show and place the tooltip.
+                          popup.style.display = 'block';
+                          popup.style.top = posDOM.y + 'px';
+                          popup.style.left = posDOM.x + 'px';
+                      }
                   
 
 

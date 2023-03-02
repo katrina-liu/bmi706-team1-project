@@ -7,6 +7,9 @@ df_unique = pd.read_csv("data/civic_data_unique.tsv")
 df_unique.dropna(subset=['drugs','variant','disease'])
 
 variant = st.text_input("Search a variant here:")
+print(st.experimental_get_query_params())
+if "variant" in st.experimental_get_query_params():
+    variant = st.experimental_get_query_params()["variant"][0]
 
 if len(variant) > 0 and variant in df_unique["variant"].unique():  # TODO: Change this to if variant is valid
     disease_tab, therapy_tab = st.tabs(["Disease", "Therapy"])

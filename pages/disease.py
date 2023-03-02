@@ -84,7 +84,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
             else:
                 variant_node = node
                 variant_nodes[gene_variant_name] = variant_node
-                G.add_node(variant_node, size=20, title='variant', group=1,
+                G.add_node(variant_node, size=20, title="<a href='http://localhost:8501/variant?variant=Overexpression'>'variant", group=1,
                            label=gene_variant_name)
                 G.add_edge(0, variant_node)
                 node += 1
