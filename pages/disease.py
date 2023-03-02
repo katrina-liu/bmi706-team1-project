@@ -24,6 +24,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
     disease_networks_tab, disease_variants_tab, time_series_tab = \
         st.tabs(["Disease Networks", "Disease Variants", "Time Series"])
     df_unique_disease = df_unique[df_unique["disease"] == disease]
+    df_disease = df[df["disease"] == disease]
 
     with disease_networks_tab:
         # TODO: change tooltip title
@@ -154,7 +155,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         st.altair_chart(bar_g_v)
             
         st.header("Disease Gene Variant Heatmap")
-        heatmap = alt.Chart(df_unique).mark_rect().encode(
+        heatmap = alt.Chart(df_unique_disease).mark_rect().encode(
             x=alt.X("gene:N",bin=False, title="Genes"),
             y=alt.Y("disease:N",bin=False, title= "Diseases"),
             color = alt.Color('count():Q'),
@@ -165,8 +166,8 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         st.altair_chart(heatmap)
         
     with time_series_tab:
-        st.header("Number of Records of Disease over Time")
-        time_series = alt.Chart(df).mark_line().encode(
+        st.header("Number of Records of " + disease + " over Time")
+        time_series = alt.Chart(df_disease).mark_line().encode(
             x=alt.X("year:N"),
             y=alt.Y("num_occ:Q", title="Number of Disease Records"), 
             ).transform_aggregate(
