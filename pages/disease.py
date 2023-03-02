@@ -4,7 +4,9 @@ import nx_altair as nxa
 from pyvis.network import Network
 import streamlit.components.v1 as components
 import pandas as pd
+import altair as alt
 
+df = pd.read_csv("data/civic_data.tsv")
 
 @st.cache_data
 def load_unique_civic_data():
@@ -139,13 +141,41 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
 
     with disease_variants_tab:
         st.header("Disease Gene Variant Bar")
-        # TODO: insert bar
+        bar_g_v = alt.Chart(df_unique_disease).mark_bar().encode(
+            x=alt.X('gene:N', title="Gene Names"),
+            y=alt.Y('num_var:Q', title="Number of Variants"),
+            tooltip=["gene", "num_var:Q"] 
+            ).transform_aggregate(
+                    num_var='count(variant)',
+                    groupby=["gene"]
+                    ).properties(
+                    width = 500,
+                )
+        st.altair_chart(bar_g_v)
+            
         st.header("Disease Gene Variant Heatmap")
-        # TODO: insert selector and heatmap
-
+        heatmap = alt.Chart(df_unique).mark_rect().encode(
+            x=alt.X("gene:N",bin=False, title="Genes"),
+            y=alt.Y("disease:N",bin=False, title= "Diseases"),
+            color = alt.Color('count():Q'),
+            tooltip=["disease","gene","variant"]
+            ).properties(
+                    width = 1000,
+                )
+        st.altair_chart(heatmap)
+        
     with time_series_tab:
-        st.header("Number of Incidence of Disease over Time")
-        # TODO: insert line
+        st.header("Number of Records of Disease over Time")
+        time_series = alt.Chart(df).mark_line().encode(
+            x=alt.X("year:N"),
+            y=alt.Y("num_occ:Q", title="Number of Disease Records"), 
+            ).transform_aggregate(
+                num_occ='count(disease)',
+                groupby=["year"]
+                ).properties(
+                    width = 500,
+                )
+        st.altair_chart(time_series)    
 else:
     if len(disease) > 0:
         st.markdown(
