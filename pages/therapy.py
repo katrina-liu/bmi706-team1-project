@@ -22,9 +22,8 @@ if len(therapy) > 0 and therapy in df_unique["drugs"].unique(): # TODO: Change t
             ).transform_aggregate(
                 num_ev='count(evidence_id)',
                 groupby=["variant","drugs"]
-                ).properties(
-                    width=250
-                    )
+                )
+            
         st.altair_chart(donut_t_v)
 
     with disease_tab:
@@ -37,9 +36,8 @@ if len(therapy) > 0 and therapy in df_unique["drugs"].unique(): # TODO: Change t
             ).transform_aggregate(
                 num_ev='count(evidence_id)',
                 groupby=["disease","drugs"]
-                ).properties(
-                    width=250
-                    )
+                )
+            
         st.altair_chart(donut_t_d)
 else:
     st.title("Therapy")

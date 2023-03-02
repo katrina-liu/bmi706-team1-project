@@ -1,4 +1,6 @@
 import streamlit as st
+import altair as alt
+import pandas as pd
 
 df = pd.read_csv("data/civic_data.tsv")
 df_unique = pd.read_csv("data/civic_data_unique.tsv")
@@ -20,9 +22,8 @@ if len(variant) > 0 and variant in df_unique["variant"].unique():  # TODO: Chang
             ).transform_aggregate(
                 num_ev='count(evidence_id)',
                 groupby=["disease","variant"]
-                ).properties(
-                    width=250
-                    )
+                )
+            
         st.altair_chart(donut_v_d)
         
     with therapy_tab:
@@ -35,9 +36,8 @@ if len(variant) > 0 and variant in df_unique["variant"].unique():  # TODO: Chang
             ).transform_aggregate(
                 num_ev='count(evidence_id)',
                 groupby=["variant","drugs"]
-                ).properties(
-                    width=250
-                    )
+                )
+            
         st.altair_chart(donut_v_t)
 else:
     st.title("Variant")
