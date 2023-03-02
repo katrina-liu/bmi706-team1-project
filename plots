@@ -100,7 +100,7 @@ donut2 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
 )
 
 ### Number of Evidence Showing Connection between Therapy and Variant
-donut3 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+donut3 = alt.Chart(source).mark_arc(innerRadius=50, outerRadius=90).encode(
     theta = alt.Theta("num_ev:Q"),
     color = "variant:N",
     tooltip=["num_ev:Q", "variant:N","drugs:N"]
@@ -112,7 +112,7 @@ donut3 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
 )
 
 ### Number of Evidence Showing Connection between Therapy and Disease
-donut4 = base.mark_arc(innerRadius=50, outerRadius=90).encode(
+donut4 = alt.Chart(source).mark_arc(innerRadius=50, outerRadius=90).encode(
     theta = alt.Theta("num_ev:Q"),
     color = "disease:N",
     tooltip=["num_ev:Q", "disease:N","drugs:N"]
