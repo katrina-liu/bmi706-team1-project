@@ -1,6 +1,5 @@
 import streamlit as st
 import networkx as nx
-import nx_altair as nxa
 from pyvis.network import Network
 import streamlit.components.v1 as components
 import pandas as pd
