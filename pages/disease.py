@@ -154,7 +154,13 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         st.altair_chart(bar_g_v)
             
         st.header("Disease Gene Variant Heatmap")
-        heatmap = alt.Chart(df_unique_disease).mark_rect().encode(
+        
+        default = df_unique_disease['disease'].unique()
+        dieases_selector = st.multiselect('Diseases', df_unique["disease"].unique(), default)
+        subset = df_unique[df_unique["disease"].isin(dieases_selector)]
+
+        
+        heatmap = alt.Chart(subset).mark_rect().encode(
             x=alt.X("gene:N",bin=False, title="Genes"),
             y=alt.Y("disease:N",bin=False, title= "Diseases"),
             color = alt.Color('count():Q'),
