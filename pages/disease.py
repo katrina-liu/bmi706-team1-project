@@ -145,6 +145,8 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         default = df_unique_disease['disease'].unique()
         dieases_selector = st.multiselect('Diseases', df_unique["disease"].unique(), default)
         subset = df_unique[df_unique["disease"].isin(dieases_selector)]
+        subset2 = df[df["disease"].isin(dieases_selector)]
+        
 
 		# add interaction
         selector = alt.selection_single(
@@ -154,10 +156,10 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         
         # Disease Gene Variant Heatmap
         heatmap = alt.Chart(subset).mark_rect().encode(
-            x=alt.X("gene:N",bin=False, title="Genes"),
-            y=alt.Y("disease:N",bin=False, title= "Diseases"),
+            x=alt.X("gene:N", title="Genes"),
+            y=alt.Y("disease:N", title= "Diseases"),
             color = alt.Color('count():Q'),
-            tooltip=["disease","gene","variant"]
+            tooltip=["disease","gene",alt.Tooltip('count():Q', title='Number of Variants')]
             ).properties(
                 width = 600,
                 title = "Disease Gene Variant Heatmap"
@@ -168,11 +170,8 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
 		# Disease Gene Variant Bar
         bar_g_v = alt.Chart(subset).mark_bar().encode(
             x=alt.X('gene:N', title="Gene Names"),
-            y=alt.Y('num_var:Q', title="Number of Variants"),
-            tooltip=["gene", "num_var:Q"] 
-            ).transform_aggregate(
-                    num_var='count(variant)',
-                    groupby=["gene"]
+            y=alt.Y('count():Q', title="Number of Variants"),
+            tooltip=["gene", alt.Tooltip('count():Q', title='Number of Variants')] 
             ).properties(
                     width = 600,
                     title = "Disease Gene Variant Bar"
@@ -184,18 +183,21 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         st.altair_chart(heatmap&bar_g_v)
         
         
-    with time_series_tab:
-        st.header("Number of Records of " + disease + " over Time")
-        time_series = alt.Chart(df_disease).mark_line().encode(
+    #with time_series_tab:
+        st.header("Number of Records over Time")
+        time_series = alt.Chart(subset2).mark_line().encode(
             x=alt.X("year:N"),
-            y=alt.Y("num_occ:Q", title="Number of Disease Records"), 
-            ).transform_aggregate(
-                num_occ='count(disease)',
-                groupby=["year"]
-                ).properties(
-                    width = 500,
-                )
+            y=alt.Y("count(disease):Q", title="Number of Disease Records"), 
+            color = 'disease:N',
+            tooltip=["year:N",alt.Tooltip("count(disease):Q", title="Number of Records")]
+            ).properties(
+                    width = 600,
+            )#.transform_filter(
+			#	selector
+			#)
+			
         st.altair_chart(time_series)    
+
 else:
     if len(disease) > 0:
         st.markdown(
