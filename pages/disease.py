@@ -139,36 +139,50 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         HtmlFile = open(f'{path}/dvt_network.html', 'r', encoding='utf-8')
         components.html(HtmlFile.read(), height=500)
 
-    with disease_variants_tab:
-        st.header("Disease Gene Variant Bar")
-        bar_g_v = alt.Chart(df_unique_disease).mark_bar().encode(
-            x=alt.X('gene:N', title="Gene Names"),
-            y=alt.Y('num_var:Q', title="Number of Variants"),
-            tooltip=["gene", "num_var:Q"] 
-            ).transform_aggregate(
-                    num_var='count(variant)',
-                    groupby=["gene"]
-                    ).properties(
-                    width = 500,
-                )
-        st.altair_chart(bar_g_v)
-            
-        st.header("Disease Gene Variant Heatmap")
-        
+    with disease_variants_tab:    
+
+        # heatmap multi-selector
         default = df_unique_disease['disease'].unique()
         dieases_selector = st.multiselect('Diseases', df_unique["disease"].unique(), default)
         subset = df_unique[df_unique["disease"].isin(dieases_selector)]
 
+		# add interaction
+        selector = alt.selection_single(
+        	fields = ["disease"],
+        	init = {"disease": default[0]}
+        	)
         
+        # Disease Gene Variant Heatmap
         heatmap = alt.Chart(subset).mark_rect().encode(
             x=alt.X("gene:N",bin=False, title="Genes"),
             y=alt.Y("disease:N",bin=False, title= "Diseases"),
             color = alt.Color('count():Q'),
             tooltip=["disease","gene","variant"]
             ).properties(
-                    width = 1000,
-                )
-        st.altair_chart(heatmap)
+                width = 600,
+                title = "Disease Gene Variant Heatmap"
+            ).add_selection(
+            	selector
+            )
+        
+		# Disease Gene Variant Bar
+        bar_g_v = alt.Chart(subset).mark_bar().encode(
+            x=alt.X('gene:N', title="Gene Names"),
+            y=alt.Y('num_var:Q', title="Number of Variants"),
+            tooltip=["gene", "num_var:Q"] 
+            ).transform_aggregate(
+                    num_var='count(variant)',
+                    groupby=["gene"]
+            ).properties(
+                    width = 600,
+                    title = "Disease Gene Variant Bar"
+            ).transform_filter(
+				selector
+			)
+			
+        
+        st.altair_chart(heatmap&bar_g_v)
+        
         
     with time_series_tab:
         st.header("Number of Records of " + disease + " over Time")
