@@ -61,7 +61,7 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
     df_variant = df[df["gene-variant"] == variant]
 
     with disease_tab:
-        df_variant_disease = df_variant[df_variant["disease"].notna()]
+        df_variant_disease = df_variant.dropna(subset=["disease])
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Diseases")
         donut_v_d = alt.Chart(df_variant_disease).mark_arc(
@@ -78,7 +78,7 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
         st.altair_chart(donut_v_d, use_container_width=True)
 
     with therapy_tab:
-        df_variant_therapy = df_variant[df_variant["drugs"].notna()]
+        df_variant_therapy = df_variant.dropna(subset=["drugs"])
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Therapies")
         donut_v_t = alt.Chart(df_variant_therapy).mark_arc(
