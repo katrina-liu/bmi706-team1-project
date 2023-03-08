@@ -8,7 +8,7 @@ path = "html_files"
 
 st.set_page_config(layout="wide")
 st.title("CIVic Visualization Tool")
-st.markdown("It would take about 20s to load...")
+st.markdown("It would take about 10s to load...")
 
 
 @st.cache_data
