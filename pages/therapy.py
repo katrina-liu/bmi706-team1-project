@@ -2,34 +2,70 @@ import streamlit as st
 import altair as alt
 import pandas as pd
 
-df = pd.read_csv("data/civic_data.tsv")
-df_unique = pd.read_csv("data/civic_data_unique.tsv")
-df_unique.dropna(subset=['drugs','variant','disease'])
+
+deployed = False
+if deployed:
+    HOME_URL = "https://katrina-liu-bmi706-team1-project-main-w7rnad.streamlit.app/"
+else:
+    HOME_URL = "http://localhost:8501/"
+
+
+st.set_page_config(layout="centered")
+
+
+@st.cache_data
+def load_df():
+    df = pd.read_csv("data/civic_data.tsv")
+    df["gene-variant"] = df["gene"] + "-" + df["variant"]
+    return df[df["drugs"].notna()]
+
+
+@st.cache_data
+def load_unique_civic_data():
+    columns = ["gene", "variant", "disease", "drugs"]
+    df = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df["gene-variant"] = df["gene"] + "-" + df["variant"]
+    return df[df["drugs"].notna()]
+
+
+df = load_df()
+df_unique = load_unique_civic_data()
 
 therapy = st.text_input("Search a therapy here:")
 
+if len(therapy) == 0:
+    url_params = st.experimental_get_query_params()
+    if "therapy" in url_params.keys():
+        therapy = url_params["therapy"][0]
+
 if len(therapy) > 0 and therapy in df_unique["drugs"].unique(): # TODO: Change this to if therapy is valid
+    therapy_url = "/therapy"
+    st.markdown(f'''
+        <a href={therapy_url} target="_self">Back</a>
+        ''', unsafe_allow_html=True)
     variant_tab, disease_tab = st.tabs(["Variant", "Disease"])
-    df_unique_therapy = df_unique[df_unique["drugs"] == therapy]
+    df_therapy = df[df["drugs"] == therapy]
     
     with variant_tab:
         st.header("Number of Evidences Showing Connection between "+ therapy+
                  " and Variants")
-        donut_t_v = alt.Chart(df_unique_therapy).mark_arc(innerRadius=50, outerRadius=90).encode(
+        df_therapy_variant = df_therapy[df_therapy["gene-variant"].notna()]
+        donut_t_v = alt.Chart(df_therapy_variant).mark_arc(innerRadius=50, outerRadius=90).encode(
             theta = alt.Theta("num_ev:Q"),
-            color = alt.Color("variant:N", title = "Variants"),
-            tooltip=["num_ev:Q", "variant:N","drugs:N"]
+            color = alt.Color("gene-variant:N", title = "Variants"),
+            tooltip=["num_ev:Q", "gene-variant:N","drugs:N"]
             ).transform_aggregate(
                 num_ev='count(evidence_id)',
-                groupby=["variant","drugs"]
-                )
+                groupby=["gene-variant","drugs"]
+            )
             
-        st.altair_chart(donut_t_v)
+        st.altair_chart(donut_t_v, use_container_width=True)
 
     with disease_tab:
         st.header("Number of Evidences Showing Connection between "+ therapy+
                  " and Diseases")
-        donut_t_d = alt.Chart(df_unique_therapy).mark_arc(innerRadius=50, outerRadius=90).encode(
+        df_therapy_disease = df_therapy[df_therapy["disease"].notna()]
+        donut_t_d = alt.Chart(df_therapy_disease).mark_arc(innerRadius=50, outerRadius=90).encode(
             theta = alt.Theta("num_ev:Q"),
             color = alt.Color("disease:N", title = "Diseases"),
             tooltip=["num_ev:Q", "disease:N","drugs:N"]
@@ -38,7 +74,28 @@ if len(therapy) > 0 and therapy in df_unique["drugs"].unique(): # TODO: Change t
                 groupby=["disease","drugs"]
                 )
             
-        st.altair_chart(donut_t_d)
+        st.altair_chart(donut_t_d, use_container_width=True)
 else:
+    if len(therapy) > 0:
+        st.markdown(
+            ":red[The therapy you are looking for does not exist in the CIVic " +
+            "database. Please try again with a therapy in the following chart]")
     st.title("Therapy")
-    # TODO: maybe show some overview charts about therapy
+    Year = st.slider("Year", min(df["year"]), max(df["year"]), value=2018)
+    subset = df[df["year"] == Year]
+    subset["url"] = "/therapy?therapy=" + subset["drugs"]
+
+    plot1 = alt.Chart(subset).mark_bar(height=20).encode(
+        x=alt.X(aggregate="count", type='quantitative',
+                title="Number of Records"),
+        y=alt.Y('drugs:N', title="Drugs", sort="-x"),
+        href="url",
+        tooltip=["drugs",
+                 alt.Tooltip(aggregate="count", title="Number of Records")]
+    ).properties(
+        title=f"Number of Records of All Therapies Reported in {Year}",
+        width=650,
+        height=alt.Step(30)
+    )
+
+    st.altair_chart(plot1, use_container_width=True)
