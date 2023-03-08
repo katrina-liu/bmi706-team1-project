@@ -11,17 +11,31 @@ st.title("CIVic Visualization Tool")
 
 
 @st.cache_data
-def load_df_unique():
-    df = pd.read_csv("data/civic_data_unique.tsv")
-    df = df[["gene", "variant", "drugs", "disease"]]
-    df = df.drop_duplicates()
-    df = df.dropna()
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df
+def load_unique_civic_data():
+    columns = ["gene", "variant", "disease", "drugs"]
+    df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
+        subset=columns)
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
+                                                 "Better Outcome"])]
+    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
+                                   'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                   'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                   'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                   'UNDEREXPRESSION', 'REARRANGEMENT',
+                                   'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                   'ISOFORM EXPRESSION','NUCLEAR EXPRESSION',
+                                   'WILD TYPE', 'PHOSPHORYLATION',
+                                   'FRAMESHIFT MUTATION', 'DELETERIOUS MUTATION',
+                                   'BIALLELIC INACTIVATION', 'TRUNCATING FUSION' ,
+                                   'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
+                                   'COPY NUMBER VARIATION','RARE MUTATION'
+                                   ])]
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["disease"].notna()]
 
 
-df_unique = load_df_unique()
-
+df_unique = load_unique_civic_data()
 
 @st.cache_data
 def creat_graph():
@@ -37,8 +51,8 @@ def creat_graph():
             node += 1
         if row["gene"] not in nodes.keys():
             nodes[row["gene"]] = node
-            G.add_node(node, title="gene:" + row["gene"], label=row["gene"],
-                       group=2)
+            G.add_node(node, title="gene:" + row["gene"],
+                       label=row["gene"], group=2)
             node += 1
         if row["gene-variant"] not in nodes.keys():
             nodes[row["gene-variant"]] = node

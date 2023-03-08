@@ -8,6 +8,25 @@ st.set_page_config(layout="centered")
 @st.cache_data
 def load_df():
     df_ = pd.read_csv("data/civic_data.tsv")
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
+                                                 "Better Outcome"])]
+    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
+                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                    'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                    'UNDEREXPRESSION', 'REARRANGEMENT',
+                                    'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                    'ISOFORM EXPRESSION', 'NUCLEAR EXPRESSION',
+                                    'WILD TYPE', 'PHOSPHORYLATION',
+                                    'FRAMESHIFT MUTATION',
+                                    'DELETERIOUS MUTATION',
+                                    'BIALLELIC INACTIVATION',
+                                    'TRUNCATING FUSION',
+                                    'FUSION', 'ALTERNATIVE TRANSCRIPT (ATI)',
+                                    'WILDTYPE',
+                                    'COPY NUMBER VARIATION', 'RARE MUTATION'
+                                    ])]
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["gene-variant"].notna()]
 
@@ -15,9 +34,29 @@ def load_df():
 @st.cache_data
 def load_unique_civic_data():
     columns = ["gene", "variant", "disease", "drugs"]
-    df_ = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
+        subset=columns)
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
+                                                 "Better Outcome"])]
+    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
+                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                    'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                    'UNDEREXPRESSION', 'REARRANGEMENT',
+                                    'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                    'ISOFORM EXPRESSION', 'NUCLEAR EXPRESSION',
+                                    'WILD TYPE', 'PHOSPHORYLATION',
+                                    'FRAMESHIFT MUTATION',
+                                    'DELETERIOUS MUTATION',
+                                    'BIALLELIC INACTIVATION',
+                                    'TRUNCATING FUSION',
+                                    'FUSION', 'ALTERNATIVE TRANSCRIPT (ATI)',
+                                    'WILDTYPE',
+                                    'COPY NUMBER VARIATION', 'RARE MUTATION'
+                                    ])]
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    return df_[df_["gene-variant"].notna()]
+    return df_[df_["disease"].notna()]
 
 
 df = load_df()
@@ -77,6 +116,7 @@ else:
             "database. Please try again with a variant in the following chart]")
 
     st.title("Variant")
+    df = df[df["gene-variant"].isin(df_unique["gene-variant"])]
     Year = st.slider("Year", min(df["year"]), max(df["year"]), value=2018)
     subset = df[df["year"] == Year]
     subset = subset[subset["gene-variant"].notna()]

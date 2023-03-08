@@ -11,6 +11,25 @@ st.set_page_config(layout="centered")
 @st.cache_data
 def load_df():
     df_ = pd.read_csv("data/civic_data.tsv")
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
+                                                 "Better Outcome"])]
+    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
+                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                    'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                    'UNDEREXPRESSION', 'REARRANGEMENT',
+                                    'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                    'ISOFORM EXPRESSION', 'NUCLEAR EXPRESSION',
+                                    'WILD TYPE', 'PHOSPHORYLATION',
+                                    'FRAMESHIFT MUTATION',
+                                    'DELETERIOUS MUTATION',
+                                    'BIALLELIC INACTIVATION',
+                                    'TRUNCATING FUSION',
+                                    'FUSION', 'ALTERNATIVE TRANSCRIPT (ATI)',
+                                    'WILDTYPE',
+                                    'COPY NUMBER VARIATION', 'RARE MUTATION'
+                                    ])]
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["disease"].notna()]
 
@@ -18,13 +37,31 @@ def load_df():
 @st.cache_data
 def load_unique_civic_data():
     columns = ["gene", "variant", "disease", "drugs"]
-    df_ = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
+        subset=columns)
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
+                                                 "Better Outcome"])]
+    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
+                                   'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                   'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                   'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                   'UNDEREXPRESSION', 'REARRANGEMENT',
+                                   'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                   'ISOFORM EXPRESSION','NUCLEAR EXPRESSION',
+                                   'WILD TYPE', 'PHOSPHORYLATION',
+                                   'FRAMESHIFT MUTATION', 'DELETERIOUS MUTATION',
+                                   'BIALLELIC INACTIVATION', 'TRUNCATING FUSION' ,
+                                   'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
+                                   'COPY NUMBER VARIATION','RARE MUTATION'
+                                   ])]
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["disease"].notna()]
 
 
 df = load_df()
 df_unique = load_unique_civic_data()
+print(df_unique)
 
 disease = st.text_input("Search a disease here:")
 
@@ -47,12 +84,13 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
 
     with disease_networks_tab:
         st.header("Disease Gene Variant Network")
-        # Generate a random graph
+        df_unique_disease_variant = df_unique_disease.drop_duplicates(
+            subset=["gene-variant"])
         G0 = nx.Graph()
         G0.add_node(0, size=20, title=disease, group=0, label=disease)
         node = 1
         gene_node_index = {}
-        for index, row in df_unique_disease.iterrows():
+        for index, row in df_unique_disease_variant.iterrows():
             if row["gene"] not in gene_node_index.keys():
                 G0.add_node(node, size=20, title=row["gene"], group=1,
                             label=row["gene"])
@@ -69,7 +107,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
 
         # Create legend nodes
         step = 80
-        x = -600
+        x = -1200
         y = 0
         G0.add_node(node, size=10, group=0, label="Disease", x=x, y=y,
                     physics=False, fixed=True)
@@ -88,8 +126,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         components.html(HtmlFile.read(), height=500)
 
         st.header("Disease Variant Therapy Network")
-        df_unique_disease_therapy = df_unique_disease[
-            df_unique_disease["drugs"].notna()]
+        df_unique_disease_therapy = df_unique_disease[df_unique_disease["drugs"].notna()]
         G = nx.Graph()
         node = 0
         G.add_node(node, size=20, title=disease, group=0, label=disease)
@@ -97,8 +134,21 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         variant_nodes = {}
         therapy_nodes = {}
 
-        for (index, row) in df_unique_disease.iterrows():
-            gene_variant_name = row["gene"] + "-" + row["variant"]
+        # for (index, row) in df_unique_disease.iterrows():
+        #     gene_variant_name = row["gene"] + "-" + row["variant"]
+        #     if gene_variant_name in variant_nodes.keys():
+        #         variant_node = variant_nodes[gene_variant_name]
+        #     else:
+        #         variant_node = node
+        #         variant_nodes[gene_variant_name] = variant_node
+        #         G.add_node(variant_node, size=20, title=gene_variant_name,
+        #                    group=1,
+        #                    label=gene_variant_name)
+        #         G.add_edge(0, variant_node)
+        #         node += 1
+
+        for index, row in df_unique_disease_therapy.iterrows():
+            gene_variant_name = row["gene-variant"]
             if gene_variant_name in variant_nodes.keys():
                 variant_node = variant_nodes[gene_variant_name]
             else:
@@ -109,9 +159,6 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
                            label=gene_variant_name)
                 G.add_edge(0, variant_node)
                 node += 1
-
-        for index, row in df_unique_disease_therapy.iterrows():
-            gene_variant_name = row["gene"] + "-" + row["variant"]
             if row["drugs"] in therapy_nodes.keys():
                 therapy_node = therapy_nodes[row["drugs"]]
             else:
@@ -123,7 +170,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
             G.add_edge(variant_node, therapy_node)
 
         df_unique_all_therapy = df_unique[df_unique["gene-variant"].isin(
-            df_unique_disease["gene-variant"].values)]
+            df_unique_disease_therapy["gene-variant"].values)]
         df_unique_other_therapy = df_unique_all_therapy[
             df_unique_all_therapy["disease"] != disease]
         df_unique_other_therapy = df_unique_other_therapy[
@@ -144,7 +191,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
 
         # Create legend nodes
         step = 80
-        x = -600
+        x = -1000
         y = -100
         G.add_node(node, size=10, group=0, label="Disease", x=x, y=y,
                    physics=False, fixed=True)
@@ -232,7 +279,7 @@ else:
             ":red[The disease you are looking for does not exist in the CIVic " +
             "database. Please try again with a disease in the following table]")
     st.title("Disease")
-
+    df = df[df["disease"].isin(df_unique["disease"])]
     Year = st.slider("Year", min(df["year"]), max(df["year"]), value=2018)
     subset = df[df["year"] == Year]
     subset = subset[subset["disease"].notna()]
