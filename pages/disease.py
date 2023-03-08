@@ -173,7 +173,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         G.add_node(node + 1, size=10, group=1, label="Gene-Variant", x=x,
                    y=y + step,
                    physics=False, fixed=True)
-        G.add_node(node + 2, size=10, group=2, label="Known Variant", x=x,
+        G.add_node(node + 2, size=10, group=2, label="Known Therapy", x=x,
                    y=y + 2 * step, physics=False, fixed=True)
         G.add_node(node + 3, size=10, group=3, label="Unknown Therapy", x=x,
                    y=y + 3 * step, physics=False, fixed=True)
