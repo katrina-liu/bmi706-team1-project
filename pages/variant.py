@@ -4,7 +4,7 @@ import pandas as pd
 
 st.set_page_config(layout="centered")
 
-columns = ["gene", "variant", "disease", "drugs"]
+columns = ["gene", "variant", "disease", "drugs", "year"]
 
 
 @st.cache_data
