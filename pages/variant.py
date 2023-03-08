@@ -7,16 +7,17 @@ st.set_page_config(layout="centered")
 
 @st.cache_data
 def load_df():
-    df = pd.read_csv("data/civic_data.tsv")
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["gene-variant"].notna()]
+    df_ = pd.read_csv("data/civic_data.tsv")
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["gene-variant"].notna()]
+
 
 @st.cache_data
 def load_unique_civic_data():
     columns = ["gene", "variant", "disease", "drugs"]
-    df = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["gene-variant"].notna()]
+    df_ = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["gene-variant"].notna()]
 
 
 df = load_df()
@@ -28,7 +29,7 @@ if len(variant) == 0:
     if "variant" in url_params.keys():
         variant = url_params["variant"][0]
 
-print(variant,variant in df_unique["gene-variant"].unique() )
+print(variant, variant in df_unique["gene-variant"].unique())
 
 if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
     variant_url = "/variant"
@@ -37,35 +38,37 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
             ''', unsafe_allow_html=True)
     disease_tab, therapy_tab = st.tabs(["Disease", "Therapy"])
     df_variant = df[df["gene-variant"] == variant]
-    
+
     with disease_tab:
         df_variant_disease = df_variant[df_variant["disease"].notna()]
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Diseases")
-        donut_v_d = alt.Chart(df_variant_disease).mark_arc(innerRadius=50, outerRadius=90).encode(
-            theta = alt.Theta("num_ev:Q"),
-            color = alt.Color("disease:N", title = "Diseases"),
-            tooltip=["num_ev:Q", "disease:N","variant:N"]
-            ).transform_aggregate(
-                num_ev='count(evidence_id)',
-                groupby=["disease","variant"]
-            )
-            
+        donut_v_d = alt.Chart(df_variant_disease).mark_arc(innerRadius=50,
+                                                           outerRadius=90).encode(
+            theta=alt.Theta("num_ev:Q"),
+            color=alt.Color("disease:N", title="Diseases"),
+            tooltip=["num_ev:Q", "disease:N", "variant:N"]
+        ).transform_aggregate(
+            num_ev='count(evidence_id)',
+            groupby=["disease", "variant"]
+        )
+
         st.altair_chart(donut_v_d, use_container_width=True)
-        
+
     with therapy_tab:
         df_variant_therapy = df_variant[df_variant["drugs"].notna()]
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Therapies")
-        donut_v_t = alt.Chart(df_variant_therapy).mark_arc(innerRadius=50, outerRadius=90).encode(
-            theta = alt.Theta("num_ev:Q"),
-            color = alt.Color("drugs:N", title = "Therapies"),
-            tooltip=["num_ev:Q", "variant:N","drugs:N"]
-            ).transform_aggregate(
-                num_ev='count(evidence_id)',
-                groupby=["variant","drugs"]
-                )
-            
+        donut_v_t = alt.Chart(df_variant_therapy).mark_arc(innerRadius=50,
+                                                           outerRadius=90).encode(
+            theta=alt.Theta("num_ev:Q"),
+            color=alt.Color("drugs:N", title="Therapies"),
+            tooltip=["num_ev:Q", "variant:N", "drugs:N"]
+        ).transform_aggregate(
+            num_ev='count(evidence_id)',
+            groupby=["variant", "drugs"]
+        )
+
         st.altair_chart(donut_v_t, use_container_width=True)
 else:
     if len(variant) > 0:

@@ -10,22 +10,21 @@ st.set_page_config(layout="centered")
 
 @st.cache_data
 def load_df():
-    df = pd.read_csv("data/civic_data.tsv")
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["disease"].notna()]
+    df_ = pd.read_csv("data/civic_data.tsv")
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["disease"].notna()]
 
 
 @st.cache_data
 def load_unique_civic_data():
     columns = ["gene", "variant", "disease", "drugs"]
-    df = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["disease"].notna()]
+    df_ = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["disease"].notna()]
 
 
 df = load_df()
 df_unique = load_unique_civic_data()
-
 
 disease = st.text_input("Search a disease here:")
 
@@ -98,7 +97,7 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         variant_nodes = {}
         therapy_nodes = {}
 
-        for (index,row) in df_unique_disease.iterrows():
+        for (index, row) in df_unique_disease.iterrows():
             gene_variant_name = row["gene"] + "-" + row["variant"]
             if gene_variant_name in variant_nodes.keys():
                 variant_node = variant_nodes[gene_variant_name]
@@ -197,7 +196,8 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         # Disease Gene Variant Bar
         bar_g_v = alt.Chart(subset).mark_bar().encode(
             x=alt.X('gene:N', title="Gene Names"),
-            y=alt.Y('count():Q', title="Number of Variants", axis=alt.Axis(tickMinStep=1)),
+            y=alt.Y('count():Q', title="Number of Variants",
+                    axis=alt.Axis(tickMinStep=1)),
             color="disease:N",
             tooltip=["gene",
                      alt.Tooltip('count():Q', title='Number of Variants')]
@@ -210,7 +210,8 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         # with time_series_tab:
         time_series = alt.Chart(subset2).mark_line().encode(
             x=alt.X("year:N"),
-            y=alt.Y("count(disease):Q", title="Number of Disease Records", axis=alt.Axis(tickMinStep=1)),
+            y=alt.Y("count(disease):Q", title="Number of Disease Records",
+                    axis=alt.Axis(tickMinStep=1)),
             color='disease:N',
             tooltip=["year:N",
                      alt.Tooltip("count(disease):Q", title="Number of Records")]
@@ -218,10 +219,11 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
             width=500,
             title="Number of Records over Time"
         ).transform_filter(
-        	selector
+            selector
         )
 
-        st.altair_chart(heatmap&bar_g_v&time_series, use_container_width=True)
+        st.altair_chart(heatmap & bar_g_v & time_series,
+                        use_container_width=True)
 
 else:
     st.experimental_set_query_params(disease=disease)

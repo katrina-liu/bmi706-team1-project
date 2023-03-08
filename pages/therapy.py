@@ -2,30 +2,22 @@ import streamlit as st
 import altair as alt
 import pandas as pd
 
-
-deployed = False
-if deployed:
-    HOME_URL = "https://katrina-liu-bmi706-team1-project-main-w7rnad.streamlit.app/"
-else:
-    HOME_URL = "http://localhost:8501/"
-
-
 st.set_page_config(layout="centered")
 
 
 @st.cache_data
 def load_df():
-    df = pd.read_csv("data/civic_data.tsv")
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["drugs"].notna()]
+    df_ = pd.read_csv("data/civic_data.tsv")
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["drugs"].notna()]
 
 
 @st.cache_data
 def load_unique_civic_data():
     columns = ["gene", "variant", "disease", "drugs"]
-    df = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
-    df["gene-variant"] = df["gene"] + "-" + df["variant"]
-    return df[df["drugs"].notna()]
+    df_ = pd.read_csv("data/civic_data_unique.tsv")[columns].drop_duplicates()
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    return df_[df_["drugs"].notna()]
 
 
 df = load_df()
@@ -38,48 +30,50 @@ if len(therapy) == 0:
     if "therapy" in url_params.keys():
         therapy = url_params["therapy"][0]
 
-if len(therapy) > 0 and therapy in df_unique["drugs"].unique(): # TODO: Change this to if therapy is valid
+if len(therapy) > 0 and therapy in df_unique["drugs"].unique():
     therapy_url = "/therapy"
     st.markdown(f'''
         <a href={therapy_url} target="_self">Back</a>
         ''', unsafe_allow_html=True)
     variant_tab, disease_tab = st.tabs(["Variant", "Disease"])
     df_therapy = df[df["drugs"] == therapy]
-    
+
     with variant_tab:
-        st.header("Number of Evidences Showing Connection between "+ therapy+
-                 " and Variants")
+        st.header("Number of Evidences Showing Connection between " + therapy +
+                  " and Variants")
         df_therapy_variant = df_therapy[df_therapy["gene-variant"].notna()]
-        donut_t_v = alt.Chart(df_therapy_variant).mark_arc(innerRadius=50, outerRadius=90).encode(
-            theta = alt.Theta("num_ev:Q"),
-            color = alt.Color("gene-variant:N", title = "Variants"),
-            tooltip=["num_ev:Q", "gene-variant:N","drugs:N"]
-            ).transform_aggregate(
-                num_ev='count(evidence_id)',
-                groupby=["gene-variant","drugs"]
-            )
-            
+        donut_t_v = alt.Chart(df_therapy_variant).mark_arc(innerRadius=50,
+                                                           outerRadius=90).encode(
+            theta=alt.Theta("num_ev:Q"),
+            color=alt.Color("gene-variant:N", title="Variants"),
+            tooltip=["num_ev:Q", "gene-variant:N", "drugs:N"]
+        ).transform_aggregate(
+            num_ev='count(evidence_id)',
+            groupby=["gene-variant", "drugs"]
+        )
+
         st.altair_chart(donut_t_v, use_container_width=True)
 
     with disease_tab:
-        st.header("Number of Evidences Showing Connection between "+ therapy+
-                 " and Diseases")
+        st.header("Number of Evidences Showing Connection between " + therapy +
+                  " and Diseases")
         df_therapy_disease = df_therapy[df_therapy["disease"].notna()]
-        donut_t_d = alt.Chart(df_therapy_disease).mark_arc(innerRadius=50, outerRadius=90).encode(
-            theta = alt.Theta("num_ev:Q"),
-            color = alt.Color("disease:N", title = "Diseases"),
-            tooltip=["num_ev:Q", "disease:N","drugs:N"]
-            ).transform_aggregate(
-                num_ev='count(evidence_id)',
-                groupby=["disease","drugs"]
-                )
-            
+        donut_t_d = alt.Chart(df_therapy_disease).mark_arc(innerRadius=50,
+                                                           outerRadius=90).encode(
+            theta=alt.Theta("num_ev:Q"),
+            color=alt.Color("disease:N", title="Diseases"),
+            tooltip=["num_ev:Q", "disease:N", "drugs:N"]
+        ).transform_aggregate(
+            num_ev='count(evidence_id)',
+            groupby=["disease", "drugs"]
+        )
+
         st.altair_chart(donut_t_d, use_container_width=True)
 else:
     if len(therapy) > 0:
         st.markdown(
-            ":red[The therapy you are looking for does not exist in the CIVic " +
-            "database. Please try again with a therapy in the following chart]")
+            ":red[The therapy you are looking for does not exist in the CIVic" +
+            " database. Please try again with a therapy in the following chart]")
     st.title("Therapy")
     Year = st.slider("Year", min(df["year"]), max(df["year"]), value=2018)
     subset = df[df["year"] == Year]
