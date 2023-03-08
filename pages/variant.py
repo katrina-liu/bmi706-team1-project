@@ -61,7 +61,7 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
     df_variant = df[df["gene-variant"] == variant]
 
     with disease_tab:
-        df_variant_disease = df_variant.dropna(subset=["disease])
+        df_variant_disease = df_variant.dropna(subset=["disease"])
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Diseases")
         donut_v_d = alt.Chart(df_variant_disease).mark_arc(
