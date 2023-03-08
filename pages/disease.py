@@ -7,6 +7,7 @@ import altair as alt
 
 st.set_page_config(layout="centered")
 
+columns = ["gene", "variant", "disease", "drugs"]
 
 @st.cache_data
 def load_df():
@@ -30,13 +31,13 @@ def load_df():
                                     'WILDTYPE',
                                     'COPY NUMBER VARIATION', 'RARE MUTATION'
                                     ])]
+    df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["disease"].notna()]
 
 
 @st.cache_data
 def load_unique_civic_data():
-    columns = ["gene", "variant", "disease", "drugs"]
     df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
         subset=columns)
     df_ = df_[df_["evidence_direction"] == "Supports"]
@@ -55,6 +56,7 @@ def load_unique_civic_data():
                                    'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
                                    'COPY NUMBER VARIATION','RARE MUTATION'
                                    ])]
+    df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["disease"].notna()]
 

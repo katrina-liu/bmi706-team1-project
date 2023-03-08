@@ -3,6 +3,7 @@ import altair as alt
 import pandas as pd
 
 st.set_page_config(layout="centered")
+columns = ["gene", "variant", "disease", "drugs"]
 
 
 @st.cache_data
@@ -27,6 +28,7 @@ def load_df():
                                     'WILDTYPE',
                                     'COPY NUMBER VARIATION', 'RARE MUTATION'
                                     ])]
+    df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["drugs"].notna()]
 
@@ -55,8 +57,9 @@ def load_unique_civic_data():
                                     'WILDTYPE',
                                     'COPY NUMBER VARIATION', 'RARE MUTATION'
                                     ])]
+    df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    return df_[df_["disease"].notna()]
+    return df_[df_["drugs"].notna()]
 
 
 df = load_df()

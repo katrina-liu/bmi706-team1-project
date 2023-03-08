@@ -16,8 +16,7 @@ def load_unique_civic_data():
     df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
         subset=columns)
     df_ = df_[df_["evidence_direction"] == "Supports"]
-    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
-                                                 "Better Outcome"])]
+    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity"])]
     df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
@@ -31,11 +30,14 @@ def load_unique_civic_data():
                                    'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
                                    'COPY NUMBER VARIATION','RARE MUTATION'
                                    ])]
+    df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    return df_[df_["disease"].notna()]
+    df_ = df_[df_.groupby('disease')['disease'].transform('size') > 2]
+    return df_
 
 
 df_unique = load_unique_civic_data()
+print(df_unique)
 
 @st.cache_data
 def creat_graph():
