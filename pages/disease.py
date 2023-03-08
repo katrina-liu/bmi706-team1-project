@@ -49,7 +49,6 @@ def load_unique_civic_data():
 
 df = load_df()
 df_unique = load_unique_civic_data()
-print(df_unique)
 
 disease = st.text_input("Search a disease here:")
 

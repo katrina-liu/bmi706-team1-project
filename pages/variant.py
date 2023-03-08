@@ -51,7 +51,6 @@ if len(variant) == 0:
     if "variant" in url_params.keys():
         variant = url_params["variant"][0]
 
-print(variant, variant in df_unique["gene-variant"].unique())
 
 if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
     variant_url = "/variant"

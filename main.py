@@ -8,6 +8,7 @@ path = "html_files"
 
 st.set_page_config(layout="wide")
 st.title("CIVic Visualization Tool")
+st.markdown("It would take about 20s to load...")
 
 
 @st.cache_data
@@ -35,14 +36,13 @@ def load_unique_civic_data():
                                     ])]
     df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    df_ = df_[df_.groupby('disease')['disease'].transform('size') > 5]
-    df_ = df_[df_.groupby('gene')['gene'].transform('size') > 5]
+    df_ = df_[df_.groupby('disease')['disease'].transform('size') > 10]
+    df_ = df_[df_.groupby('gene')['gene'].transform('size') > 10]
 
-    return df_
+    return df_.head(n=200)
 
 
 df_unique = load_unique_civic_data()
-print(df_unique)
 
 @st.cache_data
 def creat_graph():
@@ -80,17 +80,10 @@ def creat_graph():
         G.add_edge(therapy_node, variant_node)
     nt = Network(width='100%', height="100vh")
     nt.from_nx(G)
-    nt.repulsion(
-        node_distance=420,
-        central_gravity=0.33,
-        spring_length=110,
-        spring_strength=0.10,
-        damping=0.95
-    )
     nt.save_graph(f'{path}/all_network.html')
     return
 
 
 creat_graph()
 HtmlFile = open(f'{path}/all_network.html', 'r', encoding='utf-8')
-components.html(HtmlFile.read(), height=900)
+components.html(HtmlFile.read(), height=800)
