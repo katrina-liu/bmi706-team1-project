@@ -3,36 +3,16 @@ import altair as alt
 import pandas as pd
 
 st.set_page_config(layout="centered")
-
-columns = ["gene", "variant", "disease", "drugs", "year"]
-
+columns = ["gene", "variant", "disease", "drugs"]
 
 @st.cache_data
 def load_df():
     df_ = pd.read_csv("data/civic_data.tsv")
     df_ = df_[df_["evidence_direction"] == "Supports"]
-    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
-                                                 "Better Outcome"])]
-    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
-                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
-                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
-                                    'INTERNAL DUPLICATION', 'AMPLIFICATION',
-                                    'UNDEREXPRESSION', 'REARRANGEMENT',
-                                    'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
-                                    'ISOFORM EXPRESSION', 'NUCLEAR EXPRESSION',
-                                    'WILD TYPE', 'PHOSPHORYLATION',
-                                    'FRAMESHIFT MUTATION',
-                                    'DELETERIOUS MUTATION',
-                                    'BIALLELIC INACTIVATION',
-                                    'TRUNCATING FUSION',
-                                    'FUSION', 'ALTERNATIVE TRANSCRIPT (ATI)',
-                                    'WILDTYPE',
-                                    'COPY NUMBER VARIATION', 'RARE MUTATION'
-                                    ])]
-    df_ = df_[columns].dropna().astype(str)
+    df_[columns] = df_[columns].astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    return df_[df_["gene-variant"].notna()]
-
+    df_ = df_.dropna(subset=columns)
+    return df_
 
 @st.cache_data
 def load_unique_civic_data():
@@ -85,8 +65,9 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
         df_variant_disease = df_variant[df_variant["disease"].notna()]
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Diseases")
-        donut_v_d = alt.Chart(df_variant_disease).mark_arc(innerRadius=50,
-                                                           outerRadius=90).encode(
+        donut_v_d = alt.Chart(df_variant_disease).mark_arc(
+            innerRadius=50,
+            outerRadius=90).encode(
             theta=alt.Theta("num_ev:Q"),
             color=alt.Color("disease:N", title="Diseases"),
             tooltip=["num_ev:Q", "disease:N", "variant:N"]
@@ -101,8 +82,9 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
         df_variant_therapy = df_variant[df_variant["drugs"].notna()]
         st.header("Number of Evidences Showing Connection between " + variant +
                   " and Therapies")
-        donut_v_t = alt.Chart(df_variant_therapy).mark_arc(innerRadius=50,
-                                                           outerRadius=90).encode(
+        donut_v_t = alt.Chart(df_variant_therapy).mark_arc(
+            innerRadius=50,
+            outerRadius=90).encode(
             theta=alt.Theta("num_ev:Q"),
             color=alt.Color("drugs:N", title="Therapies"),
             tooltip=["num_ev:Q", "variant:N", "drugs:N"]
@@ -115,8 +97,9 @@ if len(variant) > 0 and variant in df_unique["gene-variant"].unique():
 else:
     if len(variant) > 0:
         st.markdown(
-            ":red[The variant you are looking for does not exist in the CIVic " +
-            "database. Please try again with a variant in the following chart]")
+            ":red[The variant you are looking for does not exist in the CIVic" +
+            " database. Please try again with a variant in the following chart]"
+        )
 
     st.title("Variant")
     df = df[df["gene-variant"].isin(df_unique["gene-variant"])]

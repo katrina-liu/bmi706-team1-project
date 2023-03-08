@@ -7,11 +7,22 @@ import altair as alt
 
 st.set_page_config(layout="centered")
 
-columns = ["gene", "variant", "disease", "drugs", "year"]
+columns = ["gene", "variant", "disease", "drugs"]
+
 
 @st.cache_data
 def load_df():
     df_ = pd.read_csv("data/civic_data.tsv")
+    df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_[columns] = df_[columns].astype(str)
+    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
+    df_ = df_.dropna(subset=columns)
+    return df_
+
+@st.cache_data
+def load_unique_civic_data():
+    df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
+        subset=columns)
     df_ = df_[df_["evidence_direction"] == "Supports"]
     df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
                                                  "Better Outcome"])]
@@ -31,31 +42,6 @@ def load_df():
                                     'WILDTYPE',
                                     'COPY NUMBER VARIATION', 'RARE MUTATION'
                                     ])]
-    df_ = df_[columns].dropna().astype(str)
-    df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    return df_[df_["disease"].notna()]
-
-
-@st.cache_data
-def load_unique_civic_data():
-    df_ = pd.read_csv("data/civic_data_unique.tsv").drop_duplicates(
-        subset=columns)
-    df_ = df_[df_["evidence_direction"] == "Supports"]
-    df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity",
-                                                 "Better Outcome"])]
-    df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
-                                   'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
-                                   'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
-                                   'INTERNAL DUPLICATION', 'AMPLIFICATION',
-                                   'UNDEREXPRESSION', 'REARRANGEMENT',
-                                   'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
-                                   'ISOFORM EXPRESSION','NUCLEAR EXPRESSION',
-                                   'WILD TYPE', 'PHOSPHORYLATION',
-                                   'FRAMESHIFT MUTATION', 'DELETERIOUS MUTATION',
-                                   'BIALLELIC INACTIVATION', 'TRUNCATING FUSION' ,
-                                   'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
-                                   'COPY NUMBER VARIATION','RARE MUTATION'
-                                   ])]
     df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
     return df_[df_["disease"].notna()]
@@ -128,26 +114,14 @@ if len(disease) > 0 and disease in df_unique["disease"].unique():
         components.html(HtmlFile.read(), height=500)
 
         st.header("Disease Variant Therapy Network")
-        df_unique_disease_therapy = df_unique_disease[df_unique_disease["drugs"].notna()]
+        df_unique_disease_therapy = df_unique_disease[
+            df_unique_disease["drugs"].notna()]
         G = nx.Graph()
         node = 0
         G.add_node(node, size=20, title=disease, group=0, label=disease)
         node += 1
         variant_nodes = {}
         therapy_nodes = {}
-
-        # for (index, row) in df_unique_disease.iterrows():
-        #     gene_variant_name = row["gene"] + "-" + row["variant"]
-        #     if gene_variant_name in variant_nodes.keys():
-        #         variant_node = variant_nodes[gene_variant_name]
-        #     else:
-        #         variant_node = node
-        #         variant_nodes[gene_variant_name] = variant_node
-        #         G.add_node(variant_node, size=20, title=gene_variant_name,
-        #                    group=1,
-        #                    label=gene_variant_name)
-        #         G.add_edge(0, variant_node)
-        #         node += 1
 
         for index, row in df_unique_disease_therapy.iterrows():
             gene_variant_name = row["gene-variant"]
@@ -278,8 +252,9 @@ else:
     st.experimental_set_query_params(disease=disease)
     if len(disease) > 0:
         st.markdown(
-            ":red[The disease you are looking for does not exist in the CIVic " +
-            "database. Please try again with a disease in the following table]")
+            ":red[The disease you are looking for does not exist in the CIVic" +
+            " database. Please try again with a disease in the following table]"
+        )
     st.title("Disease")
     df = df[df["disease"].isin(df_unique["disease"])]
     Year = st.slider("Year", min(df["year"]), max(df["year"]), value=2018)

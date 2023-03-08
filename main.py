@@ -18,21 +18,26 @@ def load_unique_civic_data():
     df_ = df_[df_["evidence_direction"] == "Supports"]
     df_ = df_[df_["clinical_significance"].isin(["Positive", "Sensitivity"])]
     df_ = df_[~df_["variant"].isin(["MUTATION", "FRAMESHIFT TRUNCATION",
-                                   'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
-                                   'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
-                                   'INTERNAL DUPLICATION', 'AMPLIFICATION',
-                                   'UNDEREXPRESSION', 'REARRANGEMENT',
-                                   'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
-                                   'ISOFORM EXPRESSION','NUCLEAR EXPRESSION',
-                                   'WILD TYPE', 'PHOSPHORYLATION',
-                                   'FRAMESHIFT MUTATION', 'DELETERIOUS MUTATION',
-                                   'BIALLELIC INACTIVATION', 'TRUNCATING FUSION' ,
-                                   'FUSION','ALTERNATIVE TRANSCRIPT (ATI)','WILDTYPE',
-                                   'COPY NUMBER VARIATION','RARE MUTATION'
-                                   ])]
+                                    'LOSS-OF-FUNCTION', "PROMOTER METHYLATION",
+                                    'OVEREXPRESSION', 'LOSS', 'EXPRESSION',
+                                    'INTERNAL DUPLICATION', 'AMPLIFICATION',
+                                    'UNDEREXPRESSION', 'REARRANGEMENT',
+                                    'POLYMORPHISM', 'PROMOTER HYPERMETHYLATION',
+                                    'ISOFORM EXPRESSION', 'NUCLEAR EXPRESSION',
+                                    'WILD TYPE', 'PHOSPHORYLATION',
+                                    'FRAMESHIFT MUTATION',
+                                    'DELETERIOUS MUTATION',
+                                    'BIALLELIC INACTIVATION',
+                                    'TRUNCATING FUSION',
+                                    'FUSION', 'ALTERNATIVE TRANSCRIPT (ATI)',
+                                    'WILDTYPE',
+                                    'COPY NUMBER VARIATION', 'RARE MUTATION'
+                                    ])]
     df_ = df_[columns].dropna().astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    df_ = df_[df_.groupby('disease')['disease'].transform('size') > 2]
+    df_ = df_[df_.groupby('disease')['disease'].transform('size') > 5]
+    df_ = df_[df_.groupby('gene')['gene'].transform('size') > 5]
+
     return df_
 
 
