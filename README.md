@@ -13,19 +13,19 @@ numpy\
 pandas\
 pyvis\
 streamlit\
-altair\
+altair
 
 ## Getting Started
-* Prerequisites
+* Prerequisites\
 ```pip install networkx/numpy/pandas/pyvis/streamlit/altair```
-* Using the tool
+* Using the tool\
 ```streamlit run main.py```
 
 ## License
 Distributed under the MIT License. See ```LICENSE``` for more information.
 
 ## Contact
-Katrina Liu - xliu@hms.harvard.edu
-Songtao Xu - songtao_xu@hms.harvard.edu
-Tian Jin - tian_jin@hms.harvard.edu
+Katrina Liu - xliu@hms.harvard.edu\
+Songtao Xu - songtao_xu@hms.harvard.edu\
+Tian Jin - tian_jin@hms.harvard.edu\
 Project Link: https://github.com/katrina-liu/bmi706-team1-project
