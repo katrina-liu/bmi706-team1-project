@@ -1,2 +1,3 @@
 # bmi706-team1-project
-* streamlit run main.py
+* Generate the page
+<streamlit run main.py>
