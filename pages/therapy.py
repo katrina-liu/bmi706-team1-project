@@ -9,9 +9,9 @@ columns = ["gene", "variant", "disease", "drugs"]
 def load_df():
     df_ = pd.read_csv("data/civic_data.tsv")
     df_ = df_[df_["evidence_direction"] == "Supports"]
+    df_ = df_.dropna(subset=columns)
     df_[columns] = df_[columns].astype(str)
     df_["gene-variant"] = df_["gene"] + "-" + df_["variant"]
-    df_ = df_.dropna(subset=columns)
     return df_
 
 
