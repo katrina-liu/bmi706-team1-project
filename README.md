@@ -1,4 +1,4 @@
-# bmi706-team1-project: CIViC Visualization Tool
+# CIViC Visualization Tool
 * File Directory
     * raw CIViC data: bmi706-team1-project/data/civic/
     * parsed CIViC data: bmi706-team1-project/data/
