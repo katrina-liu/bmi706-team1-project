@@ -5,7 +5,8 @@
     * visualization scripts: ```bmi706-team1-project/pages/```
 
 ## About The Project
-This tool aims to provide an intuitive, accessible, and efficient way for researchers and students to obtain a basic overview of the entire CIViC knowledge base, and contribute to the advancement of drug repurposing research. It identify and display correlations between genes, variants, diseases, drugs, and existing therapies stored in the CIViC knowledge base. Moreover, it track the changes of disease incidences over time to reflect the potential trends and patterns in oncology research.
+This tool aims to provide an intuitive, accessible, and efficient way for researchers and students to obtain a basic overview of the entire CIViC knowledge base, and contribute to the advancement of drug repurposing research.\
+It identify and display correlations between genes, variants, diseases, drugs, and existing therapies stored in the CIViC knowledge base. Moreover, it track the changes of disease incidences over time to reflect the potential trends and patterns in oncology research.
 
 ## Built With
 networkx\
